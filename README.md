@@ -1,4 +1,5 @@
-==Visualizing a network topology as a tree==
+Visualizing a network topology as a tree
+========================================
 
 Building on the existing d3.js collapsable tree layout examples:
 
