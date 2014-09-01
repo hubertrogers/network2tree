@@ -1,0 +1,56 @@
+
+
+.active {
+    background-color: #f8f8f8;
+}
+
+.container-full {
+  margin: 0 auto;
+  width: 100%;
+}
+
+svg {
+  font: 10px sans-serif;
+}
+
+.cell.active {
+  stroke: DarkGrey;
+}
+
+.cell {
+  stroke: LightGrey;
+  stroke-width: 1;
+}
+  
+
+
+text.active {
+  fill: red;
+}
+
+.node circle {
+  cursor: pointer;
+  fill: #fff;
+  /*stroke: steelblue;*/
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-size: 11px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+.background {
+  fill: #eee;
+}
+line {
+  stroke: #fff;
+}
+text.active {
+  fill: red;
+}
