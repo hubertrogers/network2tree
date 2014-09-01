@@ -8,4 +8,4 @@ Building on the existing d3.js collapsable tree layout examples:
 
 I added functions to take a network data set, and create a tree data structure on-the-fly.
 
-Build using d3.js, with yeoman.
+Build using d3.js and Angular.js, with Yeoman.
