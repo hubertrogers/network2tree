@@ -2,28 +2,28 @@
 
 /* Controllers */
 
-var careerNetwork = angular.module('careerNetwork', []);
+var treeNetwork = angular.module('treeNetwork', []);
 
 
-careerNetwork.controller('RoleListCtrl', ['$scope', '$http',
+treeNetwork.controller('NodeListCtrl', ['$scope', '$http',
   function($scope, $http) {
-    $http.get('data/miserables.json').success(function(data) {
-      $scope.query = "va";
-      $scope.roles = data.nodes;
+    $http.get('data/movie-network-25-7-3.json').success(function(data) {
+      $scope.query = "dar";
+      $scope.nodes = data.nodes;
     });
 
     $scope.orderProp = 'name';
-    $scope.selectedRole = {
-      "name": "Valjean",
-      "group": 2
+    $scope.selectedNode = {
+      "label": "The Dark Knight (2008)",
+      "director": "Christopher Nolan"
     };
 
-    $scope.setRole = function(role) {
-      $scope.selectedRole = role;
+    $scope.setNode = function(node) {
+      $scope.selectedNode = node;
     }
 
-    $scope.isSelected = function(role) {
-      return $scope.selectedRole.name === role.name;
+    $scope.isSelected = function(node) {
+      return $scope.selectedNode.label === node.label;
     }
 
   }

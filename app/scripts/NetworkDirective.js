@@ -1,17 +1,17 @@
 (function() {
-  angular.module('careerNetwork')
+  angular.module('treeNetwork')
     .directive('network',
       function() {
         return {
           restrict: 'E',
           scope: {
-            selectedRole: '='
+            selectedNode: '='
           },
           template: '<div class="col-md-8"></div>',
           replace: false,
           link: function(scope, el) {
 
-            scope.$watch('selectedRole', function(oVal, nVal) {
+            scope.$watch('selectedNode', function(oVal, nVal) {
               el.empty();
               // el.remove();
 
@@ -67,12 +67,12 @@
 
               var added = [];
 
-              d3.json("data/miserables.json", function(arrayJson) {
-                // var rootName = "Business Solutions Analyst";
-                var rootName = scope.selectedRole.name;
-                added.push(rootName);
+              d3.json("data/movie-network-25-7-3.json", function(arrayJson) {
+                // var rootLabel = "Business Solutions Analyst";
+                var rootLabel = scope.selectedNode.label;
+                added.push(rootLabel);
                 var roles = transformArray2obj(arrayJson);
-                var careerTree = addNodes(roles, rootName);
+                var careerTree = addNodes(roles, rootLabel);
                 root = careerTree;
                 root.x0 = h / 2;
                 root.y0 = 0;
@@ -83,14 +83,11 @@
                     toggle(roles, d);
                   }
                 }
-                if (rootName == "Valjean") {
+                if (rootLabel == "The Dark Knight (2008)") {
                   // Initialize the display to show a few nodes.
                   root.children.forEach(toggleAll);
-                  toggle(roles, root.children[0]);
-                  toggle(roles, root.children[1]);
-                  // toggle(roles, root.children[1].children[1]);
-                  toggle(roles, root.children[2]);
-                  // toggle(roles, root.children[2].children[0]);                
+                  toggle(roles, root.children[4]);
+                  toggle(roles, root.children[4].children[5]);
                 }
 
 
@@ -133,13 +130,13 @@
                   .attr("r", 1e-6)
                   .style("fill", function(d) {
                     if (d._children || (!d.children && !d._children)) {
-                      return c(d.group);
+                      return c(d.director);
                     } else {
                       return "#fff";
                     }
                   })
                   .style("stroke", function(d) {
-                    return c(d.group);
+                    return c(d.director);
                   });
 
                 nodeEnter.append("svg:text")
@@ -151,7 +148,7 @@
                     return d.children || d._children ? "end" : "start";
                   })
                   .text(function(d) {
-                    return d.name;
+                    return d.label;
                   })
                   .style("fill-opacity", 1e-6);
 
@@ -166,13 +163,15 @@
                   .attr("r", 4.5)
                   .style("fill", function(d) {
                     if (d._children || (!d.children && !d._children)) {
-                      return c(d.group);
+                      if (d.children || d._children) {
+                      }                      
+                      return c(d.director);
                     } else {
                       return "#fff";
                     }
                   })
                   .style("stroke", function(d) {
-                    return c(d.group);
+                    return c(d.director);
                   });
 
                 nodeUpdate.select("text")
@@ -245,35 +244,36 @@
               // Toggle children.
               function toggle(roles, d) {
                 if (d.children) {
-                  d._children = addChildren(roles, d.name, d.children);
+                  d._children = addChildren(roles, d.label, d.children);
                   d.children = null;
-                  added.splice(added.indexOf(d.name));
+                  added.splice(added.indexOf(d.label));
 
                 } else {
-                  if (added.length == 1 || added.indexOf(d.name) == -1) {
+                  if (added.length == 1 || added.indexOf(d.label) == -1) {
 
-                    d.children = addChildren(roles, d.name, d._children);
+                    d.children = addChildren(roles, d.label, d._children);
                     d._children = null;
                   }
                 }
               }
 
-              function addNodes(roles, name) {
+              function addNodes(roles, label) {
                 var careerTree = {
-                  "name": name
+                  "label": label
                 };
                 for (var role in roles) {
-                  if (roles[role]['name'] == name) {
+                  if (roles[role]['label'] == label) {
                     careerTree['children'] = roles[role]['children'];
-                    careerTree['group'] = roles[role]['group'];
-                    added.push(name);
+                    careerTree['director'] = roles[role]['director'];
+                    added.push(label);
                   }
                 }
+                console.log(careerTree);
                 return careerTree
               }
 
-              function addChildren(roles, name, children) {
-                var thing = addNodes(roles, name)
+              function addChildren(roles, label, children) {
+                var thing = addNodes(roles, label)
 
                 return thing.children;
               }
@@ -281,27 +281,27 @@
 
               function transformArray2obj(jsonArray) {
                 var treeObj = {}
-                var nameToObj = {};
+                var labelToObj = {};
                 for (var i = 0; i < jsonArray.nodes.length; i++) {
-                  nameToObj[jsonArray.nodes[i]['name']] = jsonArray.nodes[i];
+                  labelToObj[jsonArray.nodes[i]['label']] = jsonArray.nodes[i];
                 }
 
-                for (var key in nameToObj) {
+                for (var key in labelToObj) {
                   var children = [];
                   for (var i = 0; i < jsonArray.links.length; i++) {
-                    if (jsonArray.nodes[jsonArray.links[i].source].name == key) {
+                    if (jsonArray.nodes[jsonArray.links[i].source].label == key) {
                       //
                       var child = {
-                        "name": jsonArray.nodes[jsonArray.links[i].target].name,
-                        "value": jsonArray.links[i].value,
-                        "group": jsonArray.nodes[jsonArray.links[i].source].group
+                        "label": jsonArray.nodes[jsonArray.links[i].target].label,
+                        "weight": jsonArray.links[i].weight,
+                        "director": jsonArray.nodes[jsonArray.links[i].source].director
                       };
                       children.push(child);
                     }
                   }
-                  nameToObj[key]["children"] = children;
+                  labelToObj[key]["children"] = children;
                 }
-                return nameToObj;
+                return labelToObj;
               }
 
               // TODO: Pan function, can be better implemented.
@@ -339,47 +339,7 @@
 
 
 
-              function initiateDrag(d, domNode) {
-                draggingNode = d;
-                d3.select(domNode).select('.ghostCircle').attr('pointer-events', 'none');
-                d3.selectAll('.ghostCircle').attr('class', 'ghostCircle show');
-                d3.select(domNode).attr('class', 'node activeDrag');
 
-                svgGroup.selectAll("g.node").sort(function(a, b) { // select the parent and sort the path's
-                  if (a.id != draggingNode.id) return 1; // a is not the hovered element, send "a" to the back
-                  else return -1; // a is the hovered element, bring "a" to the front
-                });
-                // if nodes has children, remove the links and nodes
-                if (nodes.length > 1) {
-                  // remove link paths
-                  links = tree.links(nodes);
-                  nodePaths = svgGroup.selectAll("path.link")
-                    .data(links, function(d) {
-                      return d.target.id;
-                    }).remove();
-                  // remove child nodes
-                  nodesExit = svgGroup.selectAll("g.node")
-                    .data(nodes, function(d) {
-                      return d.id;
-                    }).filter(function(d, i) {
-                      if (d.id == draggingNode.id) {
-                        return false;
-                      }
-                      return true;
-                    }).remove();
-                }
-
-                // remove parent link
-                parentLink = tree.links(tree.nodes(draggingNode.parent));
-                svgGroup.selectAll('path.link').filter(function(d, i) {
-                  if (d.target.id == draggingNode.id) {
-                    return true;
-                  }
-                  return false;
-                }).remove();
-
-                dragStarted = null;
-              }
 
 
 
@@ -410,33 +370,6 @@
                 updateTempConnector();
               };
 
-              // Function to update the temporary connector indicating dragging affiliation
-              var updateTempConnector = function() {
-                var data = [];
-                if (draggingNode !== null && selectedNode !== null) {
-                  // have to flip the source coordinates since we did this for the existing connectors on the original tree
-                  data = [{
-                    source: {
-                      x: selectedNode.y0,
-                      y: selectedNode.x0
-                    },
-                    target: {
-                      x: draggingNode.y0,
-                      y: draggingNode.x0
-                    }
-                  }];
-                }
-                var link = svgGroup.selectAll(".templink").data(data);
-
-                link.enter().append("path")
-                  .attr("class", "templink")
-                  .attr("d", d3.svg.diagonal())
-                  .attr('pointer-events', 'none');
-
-                link.attr("d", d3.svg.diagonal());
-
-                link.exit().remove();
-              };
 
               // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
 
